@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Canvas AI Helper</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:system-ui,-apple-system,sans-serif;font-size:13px;width:100%;max-width:520px;min-width:360px;background:#fff;color:#1f2937;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:2px}
+
+/* ── Top bar ── */
+#topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #e5e7eb;background:#f9fafb;flex-shrink:0}
+#topbar h3{font-size:14px;font-weight:700;color:#111827}
+.top-btns{display:flex;gap:5px}
+.top-btn{background:none;border:1px solid #d1d5db;border-radius:6px;padding:4px 9px;cursor:pointer;font-size:13px;line-height:1;color:#6b7280;transition:all .15s}
+.top-btn:hover{background:#f3f4f6;border-color:#9ca3af}
+.top-btn.active{background:#ede9fe;border-color:#7c3aed;color:#7c3aed}
+
+#scroll-body{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+
+/* ── Tab panels ── */
+.tab-panel{display:none;border-bottom:2px solid #7c3aed;background:#faf5ff;padding:13px 14px;flex-shrink:0}
+.tab-panel.open{display:block}
+.tab-section{margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #e9d5ff}
+.tab-section:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.tab-section-title{font-size:11px;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.sfield{margin-bottom:9px}
+.sfield label{display:block;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.sfield input,.sfield select{width:100%;padding:6px 9px;font-size:12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;color:#1f2937;outline:none;transition:border-color .15s;font-family:inherit}
+.sfield input:focus,.sfield select:focus{border-color:#7c3aed}
+.hint{font-size:10px;color:#9ca3af;margin-top:2px;line-height:1.4}
+.model-row{display:flex;gap:5px}.model-row select{flex:1}
+.icon-btn{padding:6px 10px;font-size:13px;border:1px solid #d1d5db;border-radius:6px;background:#fff;cursor:pointer;color:#6b7280;flex-shrink:0;transition:all .15s;white-space:nowrap}
+.icon-btn:hover{border-color:#7c3aed;color:#7c3aed}
+.sfooter{display:flex;gap:8px;margin-top:10px;align-items:center}
+.save-btn{flex:1;padding:7px;background:#7c3aed;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:opacity .15s}
+.save-btn:hover{opacity:.88}
+.ok-msg{font-size:11px;color:#059669;display:none}
+#subjects-list{display:flex;flex-direction:column;gap:4px;max-height:110px;overflow-y:auto;margin-bottom:6px}
+.subject-row{display:flex;align-items:center;gap:5px;padding:4px 8px;background:#fff;border:1px solid #e5e7eb;border-radius:6px}
+.subject-row input{flex:1;border:none;outline:none;font-size:12px;color:#1f2937;background:transparent}
+.del-btn{background:none;border:none;cursor:pointer;color:#9ca3af;font-size:13px;padding:0 2px;line-height:1}.del-btn:hover{color:#ef4444}
+.add-row{display:flex;gap:5px}
+.add-row input{flex:1;padding:5px 8px;font-size:12px;border:1px solid #d1d5db;border-radius:6px;outline:none}
+.add-row input:focus{border-color:#7c3aed}
+.add-row button{padding:5px 10px;background:#7c3aed;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;white-space:nowrap}
+
+/* ── History panel ── */
+#history-list{display:flex;flex-direction:column;gap:6px;padding:13px 14px;flex:1;overflow-y:auto}
+.hist-item{padding:8px 10px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;cursor:pointer;transition:border-color .12s;flex-shrink:0}
+.hist-item:hover{border-color:#7c3aed;background:#faf5ff}
+.hist-header{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:2px}
+.hist-title{font-size:12px;font-weight:600;color:#1f2937;flex:1}
+.hist-del{background:none;border:none;cursor:pointer;color:#9ca3af;font-size:13px;line-height:1;flex-shrink:0}.hist-del:hover{color:#ef4444}
+.hist-meta{font-size:10px;color:#9ca3af;margin-bottom:3px}
+.hist-preview{font-size:11px;color:#6b7280;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#history-empty{font-size:12px;color:#9ca3af;text-align:center;padding:30px 14px}
+#clear-history-btn{margin:0 14px 12px;padding:6px;background:#fff;border:1px solid #fca5a5;border-radius:6px;color:#ef4444;font-size:11px;cursor:pointer;flex-shrink:0}.clear-history-btn:hover{background:#fef2f2}
+
+/* ── Main ── */
+#main{padding:12px 14px;display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+#detect-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+#detect-badge{font-size:11px;padding:2px 9px;border-radius:10px;font-weight:600;white-space:nowrap}
+#detect-badge.has-sel{background:#d1fae5;color:#065f46}
+#detect-badge.no-sel{background:#f3f4f6;color:#9ca3af}
+#use-sel-btn{font-size:11px;padding:3px 9px;cursor:pointer;background:#4f46e5;color:#fff;border:none;border-radius:5px;transition:opacity .15s}
+#use-sel-btn:disabled{background:#d1d5db;cursor:default}
+#use-sel-btn:not(:disabled):hover{opacity:.85}
+.field-label{display:block;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+#inputText{width:100%;height:90px;resize:vertical;padding:7px 9px;font-size:12px;border:1px solid #d1d5db;border-radius:6px;outline:none;font-family:inherit;color:#1f2937;background:#fff;transition:border-color .15s;line-height:1.5}
+#inputText:focus{border-color:#7c3aed}
+#files-label{font-size:11px;color:#6b7280;margin-bottom:4px}
+#files-list{display:flex;flex-wrap:wrap;gap:4px}
+.file-chip{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:10px;font-size:11px;cursor:pointer;border:1px solid #d1d5db;background:#f9fafb;color:#374151;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:all .12s;user-select:none}
+.file-chip:hover{background:#ede9fe;border-color:#a78bfa}
+.file-chip.selected{background:#ede9fe;border-color:#7c3aed;color:#5b21b6;font-weight:600}
+.file-chip.extracting{opacity:.6;cursor:wait}
+#no-files-note{font-size:11px;color:#9ca3af}
+#progress-wrap{display:none;flex-direction:column;gap:3px}
+#progress-label{font-size:11px;color:#7c3aed}
+#progress-bg{height:5px;background:#e9d5ff;border-radius:3px;overflow:hidden}
+#progress-bar{height:100%;width:0%;background:#7c3aed;border-radius:3px;transition:width .3s}
+#extract-status{font-size:11px;color:#7c3aed;background:#faf5ff;border:1px solid #e9d5ff;border-radius:5px;padding:5px 9px;display:none}
+
+/* ── Mode buttons (replace select) ── */
+.mode-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.mode-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border:1.5px solid #e5e7eb;border-radius:8px;background:#f9fafb;cursor:pointer;transition:all .15s;font-size:10px;color:#6b7280;font-weight:500}
+.mode-btn:hover{border-color:#a78bfa;background:#faf5ff;color:#5b21b6}
+.mode-btn.active{border-color:#7c3aed;background:#ede9fe;color:#5b21b6;font-weight:700}
+.mode-btn .mi{font-size:18px;line-height:1}
+.mode-btn.study-mode{border-color:#f59e0b;background:#fffbeb;color:#92400e}
+.mode-btn.study-mode.active{border-color:#d97706;background:#fef3c7;color:#78350f}
+.mode-btn.flash-mode{border-color:#10b981;background:#ecfdf5;color:#065f46}
+.mode-btn.flash-mode.active{border-color:#059669;background:#d1fae5;color:#064e3b}
+.mode-btn.feynman-mode{border-color:#6366f1;background:#eef2ff;color:#3730a3}
+.mode-btn.feynman-mode.active{border-color:#4f46e5;background:#e0e7ff;color:#312e81}
+
+#runBtn{width:100%;padding:10px;background:#4f46e5;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s;letter-spacing:.01em}
+#runBtn:hover:not(:disabled){opacity:.88}
+#runBtn:disabled{opacity:.5;cursor:not-allowed}
+#status{font-size:11px;color:#6b7280;min-height:14px}
+
+/* ── Standard output ── */
+#output-wrap{display:none}
+#out-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+#out-header span{font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.04em}
+.out-actions{display:flex;gap:4px}
+.out-btn{font-size:11px;padding:2px 8px;border:1px solid #d1d5db;border-radius:5px;background:#fff;cursor:pointer;color:#6b7280;transition:all .15s;white-space:nowrap}
+.out-btn:hover{border-color:#7c3aed;color:#7c3aed}
+#output{padding:10px 12px;border:1px solid #e5e7eb;border-radius:8px;background:#f9fafb;white-space:pre-wrap;word-break:break-word;max-height:240px;overflow-y:auto;font-size:12.5px;line-height:1.7;color:#1f2937}
+
+/* ══════════════════════════════════════════════
+   STUDY MODE UI
+══════════════════════════════════════════════ */
+#study-wrap{display:none}
+
+/* Progress header */
+.study-progress-bar{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.study-prog-bg{flex:1;height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden}
+.study-prog-fill{height:100%;background:linear-gradient(90deg,#f59e0b,#d97706);border-radius:3px;transition:width .4s}
+.study-prog-label{font-size:11px;color:#92400e;font-weight:600;white-space:nowrap}
+
+/* Score strip */
+.study-score-strip{display:flex;gap:6px;margin-bottom:10px}
+.score-pill{flex:1;text-align:center;padding:4px 6px;border-radius:6px;font-size:11px;font-weight:600}
+.score-pill.correct{background:#d1fae5;color:#065f46}
+.score-pill.wrong{background:#fee2e2;color:#991b1b}
+.score-pill.remaining{background:#f3f4f6;color:#6b7280}
+
+/* Question card */
+.study-card{background:#fffbeb;border:2px solid #fcd34d;border-radius:10px;padding:13px 14px;margin-bottom:10px}
+.study-q-num{font-size:10px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.study-q-text{font-size:13px;font-weight:600;color:#1f2937;line-height:1.5}
+
+/* Answer area */
+.study-answer-area{display:flex;flex-direction:column;gap:7px;margin-bottom:8px}
+#study-answer{width:100%;min-height:70px;resize:vertical;padding:8px 10px;font-size:12px;border:1.5px solid #d1d5db;border-radius:8px;outline:none;font-family:inherit;color:#1f2937;line-height:1.5;transition:border-color .15s}
+#study-answer:focus{border-color:#f59e0b}
+.study-btns{display:flex;gap:7px}
+#check-btn{flex:1;padding:8px;background:#f59e0b;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s}
+#check-btn:hover:not(:disabled){opacity:.88}
+#check-btn:disabled{opacity:.5;cursor:not-allowed}
+#skip-btn{padding:8px 12px;background:#fff;color:#6b7280;border:1px solid #d1d5db;border-radius:7px;font-size:12px;cursor:pointer;transition:all .15s}
+#skip-btn:hover{border-color:#9ca3af;color:#374151}
+
+/* Feedback box */
+#study-feedback{display:none;border-radius:8px;padding:11px 13px;margin-bottom:8px;font-size:12px;line-height:1.6}
+#study-feedback.correct{background:#d1fae5;border:1.5px solid #6ee7b7;color:#065f46}
+#study-feedback.partial{background:#fef3c7;border:1.5px solid #fcd34d;color:#78350f}
+#study-feedback.wrong{background:#fee2e2;border:1.5px solid #fca5a5;color:#991b1b}
+.feedback-grade{font-size:13px;font-weight:700;margin-bottom:5px}
+.feedback-model{margin-top:7px;padding-top:7px;border-top:1px solid rgba(0,0,0,.08)}
+.feedback-model-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;opacity:.7;margin-bottom:3px}
+#next-btn{width:100%;padding:8px;background:#4f46e5;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s;display:none}
+#next-btn:hover{opacity:.88}
+
+/* Session complete screen */
+#study-complete{display:none;text-align:center;padding:20px 10px}
+.complete-emoji{font-size:42px;margin-bottom:10px}
+.complete-title{font-size:16px;font-weight:700;color:#1f2937;margin-bottom:6px}
+.complete-subtitle{font-size:12px;color:#6b7280;margin-bottom:16px;line-height:1.5}
+.complete-score{display:flex;justify-content:center;gap:12px;margin-bottom:16px}
+.complete-pill{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700}
+.complete-pill.c{background:#d1fae5;color:#065f46}
+.complete-pill.w{background:#fee2e2;color:#991b1b}
+.complete-pill.s{background:#f3f4f6;color:#6b7280}
+.complete-actions{display:flex;flex-direction:column;gap:7px}
+.complete-btn{padding:9px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;transition:opacity .15s;border:none}
+.complete-btn.retry{background:#f59e0b;color:#fff}.complete-btn.retry:hover{opacity:.88}
+.complete-btn.retry-wrong{background:#ef4444;color:#fff}.complete-btn.retry-wrong:hover{opacity:.88}
+.complete-btn.back{background:#f3f4f6;color:#374151;border:1px solid #e5e7eb}.complete-btn.back:hover{background:#e5e7eb}
+
+/* ══════════════════════════════════════════════
+   FLASHCARD MODE UI
+══════════════════════════════════════════════ */
+#flash-wrap{display:none}
+
+/* Card flip */
+.flash-progress-bar{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.flash-prog-bg{flex:1;height:5px;background:#e5e7eb;border-radius:3px;overflow:hidden}
+.flash-prog-fill{height:100%;background:linear-gradient(90deg,#10b981,#059669);border-radius:3px;transition:width .4s}
+.flash-prog-label{font-size:11px;color:#065f46;font-weight:600;white-space:nowrap}
+
+.flash-card-wrap{perspective:800px;margin-bottom:10px}
+.flash-card{position:relative;width:100%;min-height:130px;cursor:pointer;transform-style:preserve-3d;transition:transform .5s}
+.flash-card.flipped{transform:rotateY(180deg)}
+.flash-face{position:absolute;width:100%;min-height:130px;backface-visibility:hidden;border-radius:10px;padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.flash-front{background:#ecfdf5;border:2px solid #6ee7b7}
+.flash-back{background:#d1fae5;border:2px solid #34d399;transform:rotateY(180deg)}
+.flash-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;opacity:.6}
+.flash-text{font-size:13px;font-weight:600;color:#1f2937;line-height:1.5}
+.flash-hint{font-size:10px;color:#6b7280;margin-top:8px}
+
+.flash-nav{display:flex;gap:7px;margin-bottom:8px}
+.flash-nav-btn{flex:1;padding:8px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;border:1.5px solid}
+.flash-nav-btn.knew{background:#d1fae5;border-color:#34d399;color:#065f46}.flash-nav-btn.knew:hover{background:#a7f3d0}
+.flash-nav-btn.didnt{background:#fee2e2;border-color:#fca5a5;color:#991b1b}.flash-nav-btn.didnt:hover{background:#fecaca}
+.flash-nav-btn.flip{background:#fff;border-color:#d1d5db;color:#374151}.flash-nav-btn.flip:hover{border-color:#7c3aed;color:#5b21b6}
+
+/* Flash complete */
+#flash-complete{display:none;text-align:center;padding:16px 6px}
+.flash-complete-actions{display:flex;flex-direction:column;gap:7px;margin-top:14px}
+
+/* ── Bottom section ── */
+.divider{border:none;border-top:1px solid #e5e7eb}
+.section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#6b7280}
+.save-notion-block{display:flex;flex-direction:column;gap:5px}
+.save-notion-row{display:flex;gap:6px}
+.save-notion-row select{flex:1;padding:6px 9px;font-size:12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;color:#1f2937;outline:none;cursor:pointer}
+.save-notion-row select:focus{border-color:#7c3aed}
+#notion-title-input{width:100%;padding:6px 9px;font-size:12px;border:1px solid #d1d5db;border-radius:6px;outline:none;font-family:inherit;color:#1f2937}
+#notion-title-input:focus{border-color:#7c3aed}
+#saveNotionBtn{padding:6px 12px;background:#fff;color:#374151;border:1px solid #d1d5db;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
+#saveNotionBtn:hover{background:#f3f4f6}
+
+#token-warning{font-size:11px;color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:5px;padding:5px 9px;display:none}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <h3>🎓 Canvas AI Helper</h3>
+  <div class="top-btns">
+    <button class="top-btn" id="history-btn" title="History">🕓</button>
+    <button class="top-btn" id="settings-btn" title="Settings">⚙️</button>
+  </div>
+</div>
+
+<div id="scroll-body">
+
+<!-- ══ SETTINGS ══ -->
+<div class="tab-panel" id="settings-panel">
+  <div class="tab-section">
+    <div class="tab-section-title">🤖 Ollama</div>
+    <div class="sfield">
+      <label>Model</label>
+      <div class="model-row">
+        <select id="model-select"><option value="">— click ↻ to load —</option></select>
+        <button class="icon-btn" id="refresh-models-btn">↻ Refresh</button>
+      </div>
+      <div class="hint">Recommended: <b>gemma2:2b</b> — fast and follows instructions well</div>
+    </div>
+  </div>
+  <div class="tab-section">
+    <div class="tab-section-title">☁️ Cloud AI (optional)</div>
+    <div class="sfield">
+      <label>Provider</label>
+      <select id="cloud-provider">
+        <option value="">— Use local Ollama only —</option>
+        <option value="openai">OpenAI (GPT-4o-mini)</option>
+        <option value="anthropic">Anthropic (Claude Haiku)</option>
+        <option value="openrouter">OpenRouter (free models)</option>
+      </select>
+      <div class="hint">When set, cloud AI is used instead of Ollama. Much better quality, costs ~€0.001–0.01 per run.</div>
+    </div>
+    <div class="sfield">
+      <label>API Key</label>
+      <input type="password" id="cloud-api-key" placeholder="Paste your API key here" autocomplete="off"/>
+      <div class="hint" id="cloud-key-hint">OpenAI: platform.openai.com/api-keys · Anthropic: console.anthropic.com · OpenRouter: openrouter.ai/keys (has free tier)</div>
+    </div>
+    <button class="icon-btn" id="test-cloud-btn" style="width:100%;margin-top:4px">Test Cloud Connection</button>
+    <div id="cloud-status" style="font-size:11px;padding:4px 8px;border-radius:5px;margin-top:4px;display:none"></div>
+  </div>
+
+
+  <div class="tab-section">
+    <div class="tab-section-title">📓 Notion</div>
+    <div class="sfield">
+      <label>Integration Token</label>
+      <input type="password" id="notion-token-input" placeholder="secret_xxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
+    </div>
+    <div class="sfield">
+      <label>Subject Pages</label>
+      <div id="subjects-list"></div>
+      <div class="add-row">
+        <input type="text" id="new-subj-name" placeholder="Subject name"/>
+        <input type="text" id="new-subj-id" placeholder="Page ID"/>
+        <button id="add-subj-btn">+ Add</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sfooter">
+    <button class="save-btn" id="save-settings-btn">Save Settings</button>
+    <span class="ok-msg" id="settings-msg">✓ Saved!</span>
+  </div>
+</div>
+
+<!-- ══ HISTORY ══ -->
+<div class="tab-panel" id="history-panel" style="padding:0;max-height:420px;overflow:hidden;display:none;flex-direction:column">
+  <div id="history-list"></div>
+  <div id="history-empty">No history yet.</div>
+  <button id="clear-history-btn">🗑 Clear all history</button>
+</div>
+
+<!-- ══ MAIN ══ -->
+<div id="main">
+
+  <div id="detect-bar">
+    <span id="detect-badge" class="no-sel">No selection</span>
+    <button id="use-sel-btn" disabled>Use selected text ↓</button>
+  </div>
+
+  <div>
+    <label class="field-label">Text / Content</label>
+    <textarea id="inputText" placeholder="Paste text — select on Canvas — or click a file chip to extract."></textarea>
+  </div>
+
+  <div>
+    <div id="files-label">Detected files: <span id="files-count">scanning…</span></div>
+    <div id="files-list"></div>
+    <span id="no-files-note" style="display:none">None found.</span>
+  </div>
+
+  <div id="progress-wrap">
+    <div id="progress-label">Processing…</div>
+    <div id="progress-bg"><div id="progress-bar"></div></div>
+  </div>
+  <div id="extract-status"></div>
+
+  <!-- Mode grid -->
+  <div>
+    <label class="field-label">Mode</label>
+    <div class="mode-grid">
+      <button class="mode-btn active" data-mode="summary"><span class="mi">📝</span>Summary</button>
+      <button class="mode-btn" data-mode="short_questions"><span class="mi">❓</span>Short Q's</button>
+      <button class="mode-btn" data-mode="open_questions"><span class="mi">🤔</span>Open Q's</button>
+      <button class="mode-btn" data-mode="exam_questions"><span class="mi">📋</span>Exam Q's</button>
+      <button class="mode-btn" data-mode="hints"><span class="mi">💡</span>Hints</button>
+      <button class="mode-btn feynman-mode" data-mode="feynman"><span class="mi">🎓</span>Feynman</button>
+      <button class="mode-btn study-mode" data-mode="study"><span class="mi">🧠</span>Study Mode</button>
+      <button class="mode-btn flash-mode" data-mode="flashcards"><span class="mi">🃏</span>Flashcards</button>
+    </div>
+  </div>
+
+  <button id="runBtn">▶ Generate</button>
+  <div id="status"></div>
+
+  <!-- Standard output -->
+  <div id="output-wrap">
+    <div id="out-header">
+      <span>Output</span>
+      <div class="out-actions">
+        <button class="out-btn" id="save-hist-btn">💾 Save</button>
+        <button class="out-btn" id="copy-btn">Copy</button>
+      </div>
+    </div>
+    <div id="output"></div>
+  </div>
+
+  <!-- ══ STUDY MODE ══ -->
+  <div id="study-wrap">
+    <div class="study-progress-bar">
+      <div class="study-prog-bg"><div class="study-prog-fill" id="study-prog-fill"></div></div>
+      <span class="study-prog-label" id="study-prog-label">0 / 0</span>
+    </div>
+    <div class="study-score-strip">
+      <div class="score-pill correct">✓ <span id="score-correct">0</span></div>
+      <div class="score-pill wrong">✗ <span id="score-wrong">0</span></div>
+      <div class="score-pill remaining">⟳ <span id="score-remaining">0</span></div>
+    </div>
+    <div class="study-card">
+      <div class="study-q-num" id="study-q-num">Question 1 of 5</div>
+      <div class="study-q-text" id="study-q-text"></div>
+    </div>
+    <div class="study-answer-area">
+      <textarea id="study-answer" placeholder="Type your answer here, then click Check…"></textarea>
+      <div class="study-btns">
+        <button id="check-btn">✓ Check my answer</button>
+        <button id="skip-btn">Skip →</button>
+      </div>
+    </div>
+    <div id="study-feedback">
+      <div class="feedback-grade" id="feedback-grade"></div>
+      <div id="feedback-text"></div>
+      <div class="feedback-model">
+        <div class="feedback-model-label">Model answer</div>
+        <div id="feedback-model-answer"></div>
+      </div>
+    </div>
+    <button id="next-btn">Next question →</button>
+
+    <!-- Session complete -->
+    <div id="study-complete">
+      <div class="complete-emoji" id="complete-emoji">🎉</div>
+      <div class="complete-title" id="complete-title">Session Complete!</div>
+      <div class="complete-subtitle" id="complete-subtitle"></div>
+      <div class="complete-score">
+        <div class="complete-pill c">✓ <span id="complete-correct">0</span> correct</div>
+        <div class="complete-pill w">✗ <span id="complete-wrong">0</span> wrong</div>
+        <div class="complete-pill s">⟳ <span id="complete-skipped">0</span> skipped</div>
+      </div>
+      <div class="complete-actions">
+        <button class="complete-btn retry" id="retry-all-btn">🔄 Retry all questions</button>
+        <button class="complete-btn retry-wrong" id="retry-wrong-btn" style="display:none">🎯 Retry wrong only</button>
+        <button class="complete-btn anki" id="study-to-anki-btn" style="display:none">🃏 Send wrong ones to Anki</button>
+        <button class="complete-btn back" id="study-back-btn">← Back to content</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FEYNMAN MODE ══ -->
+  <div id="feynman-wrap" style="display:none">
+    <div style="background:#eef2ff;border:2px solid #818cf8;border-radius:10px;padding:13px 14px;margin-bottom:10px">
+      <div style="font-size:10px;font-weight:700;color:#3730a3;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">🎓 Feynman Technique</div>
+      <div id="feynman-topic" style="font-size:13px;font-weight:600;color:#1f2937;line-height:1.5;margin-bottom:8px"></div>
+      <div style="font-size:11px;color:#6b7280;line-height:1.5">Explain this topic in your own words, as if teaching it to someone with no background. Don't look at the content — just write what you know.</div>
+    </div>
+    <textarea id="feynman-answer" style="width:100%;min-height:110px;resize:vertical;padding:8px 10px;font-size:12px;border:1.5px solid #d1d5db;border-radius:8px;outline:none;font-family:inherit;line-height:1.5;transition:border-color .15s;margin-bottom:8px" placeholder="Explain the topic here in your own words…"></textarea>
+    <button id="feynman-check-btn" style="width:100%;padding:9px;background:#4f46e5;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px">🎓 Evaluate my explanation</button>
+    <div id="feynman-feedback" style="display:none;border-radius:8px;padding:12px 13px;font-size:12px;line-height:1.7"></div>
+    <div id="feynman-next-row" style="display:none;display:none">
+      <button id="feynman-retry-btn" style="width:100%;padding:8px;background:#f59e0b;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:6px">🔄 Try again</button>
+      <button id="feynman-next-btn" style="width:100%;padding:8px;background:#6366f1;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer">Next topic →</button>
+    </div>
+    <button id="feynman-back-btn" style="width:100%;padding:7px;background:#f3f4f6;color:#374151;border:1px solid #e5e7eb;border-radius:7px;font-size:11px;cursor:pointer;margin-top:6px">← Back</button>
+  </div>
+
+  <!-- ══ FLASHCARD MODE ══ -->
+  <div id="flash-wrap">
+    <div class="flash-progress-bar">
+      <div class="flash-prog-bg"><div class="flash-prog-fill" id="flash-prog-fill"></div></div>
+      <span class="flash-prog-label" id="flash-prog-label">1 / 0</span>
+    </div>
+    <div class="flash-card-wrap">
+      <div class="flash-card" id="flash-card">
+        <div class="flash-face flash-front">
+          <div class="flash-label">Front</div>
+          <div class="flash-text" id="flash-front-text"></div>
+          <div class="flash-hint">Click card to reveal answer</div>
+        </div>
+        <div class="flash-face flash-back">
+          <div class="flash-label">Back</div>
+          <div class="flash-text" id="flash-back-text"></div>
+        </div>
+      </div>
+    </div>
+    <div class="flash-nav">
+      <button class="flash-nav-btn knew" id="flash-knew">✓ Knew it</button>
+      <button class="flash-nav-btn flip" id="flash-flip">↻ Flip</button>
+      <button class="flash-nav-btn didnt" id="flash-didnt">✗ Didn't know</button>
+    </div>
+    <div id="flash-complete">
+      <div class="complete-emoji">🃏</div>
+      <div class="complete-title">Deck complete!</div>
+      <div class="complete-subtitle" id="flash-complete-sub"></div>
+      <div class="flash-complete-actions">
+        <button class="complete-btn retry" id="flash-retry-all">🔄 Retry all</button>
+        <button class="complete-btn retry-wrong" id="flash-retry-wrong" style="display:none">🎯 Retry didn't-know</button>
+        <button class="complete-btn back" id="flash-back-btn">← Back</button>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+  <span class="section-title">📓 Save to Notion</span>
+  <div id="token-warning">⚠️ No Notion token — open ⚙️ Settings.</div>
+  <div class="save-notion-block">
+    <input type="text" id="notion-title-input" placeholder="Title (blank = file name)"/>
+    <div class="save-notion-row">
+      <select id="subject-sel"><option value="">-- Select subject --</option></select>
+      <button id="saveNotionBtn">📓 Save</button>
+    </div>
+  </div>
+
+
+
+</div><!-- /main -->
+</div><!-- /scroll-body -->
+<script src="popup.js"></script>
+</body>
+</html>
