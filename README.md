@@ -1,4 +1,4 @@
-# 🎓 Canvas AI Helper
+# 🎓 StudyFlow
 
 An AI-powered study assistant built into Canvas.  
 Extract lecture files, generate summaries, quiz yourself with active recall, and master topics with the Feynman technique — without ever leaving Canvas.
