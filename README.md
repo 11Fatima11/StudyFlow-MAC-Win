@@ -1,9 +1,27 @@
 # 🎓 StudyFlow
+### AI-powered study assistant built into Canvas
 
-An AI-powered study assistant built into Canvas.  
-Extract lecture files, generate summaries, quiz yourself with active recall, and master topics with the Feynman technique — without ever leaving Canvas.
+StudyFlow is a Chrome extension that brings AI study tools directly into Canvas — the learning platform used at Thomas More. Load any lecture file and instantly get summaries, quizzes, flashcards, active recall sessions, and Feynman-style explanations. Everything runs locally on your laptop using Ollama, so your data never leaves your device.
+
+> Built as a first-year student project using Claude Sonnet 4.6 and Ollama.
 
 ---
+
+## ✨ What it does
+
+| Mode | What you get |
+|------|-------------|
+| 📝 Summary | Structured bullet-point summary grouped by topic |
+| ❓ Short Questions | 10 quiz questions with model answers |
+| 🤔 Open Questions | 6 discussion questions for critical thinking |
+| 📋 Exam Questions | Full mock exam — multiple choice, short answer, essay |
+| 💡 Hints | Key concepts, common mistakes, memory tricks, plain-English explanation |
+| 🧠 Active Recall | AI hides answers — you answer first, then get evaluated |
+| 🎓 Feynman Mode | Explain a topic in your own words, AI scores and gives feedback |
+| 🃏 Flashcards | 12 flip cards, retry only the ones you missed |
+
+---
+
 
 ## 🚀 Installation
 
@@ -57,16 +75,6 @@ The installer will automatically:
 4. Click **Load unpacked** → select the `canvas-ext-v2` folder
 5. Go to `thomasmore.instructure.com` — the panel opens on the right
 
----
-
-### ⚙️ First-time setup (both platforms)
-
-1. Click the **⚙️ Settings** gear in the extension panel
-2. Click **↻ Refresh** to load your AI models
-3. Select **`gemma3:1b`** (recommended)
-4. Click **Save Settings**
-
-Done — the extension is ready to use.
 
 ---
 
@@ -94,7 +102,6 @@ Switch models anytime in ⚙️ Settings.
 
 ---
 
-## 📖 Study Modes
 
 ### How to start
 
@@ -102,120 +109,7 @@ Switch models anytime in ⚙️ Settings.
 2. The extension detects PDFs, slides, Word docs, Excel files automatically
 3. Click a **file chip** to extract the text
 4. Select a mode and click **Generate**
-
----
-
-### 📝 Summary
-Structured bullet-point summary of the content, grouped by topic.  
-*Use before class to preview, or after class to review.*
-
----
-
-### ❓ Short Questions
-10 short-answer quiz questions with model answers.  
-*Use to quickly check if you remember the key facts.*
-
----
-
-### 🤔 Open Questions
-6 open-ended discussion questions for critical thinking.  
-*Use to prepare for seminars or written assignments.*
-
----
-
-### 📋 Exam Questions
-A complete mock exam:
-- **Section A** — 4 multiple choice questions (correct answer marked)
-- **Section B** — 3 short answer questions (with model answers)
-- **Section C** — 1 essay question (with answer outline)
-
-*Use in the week before an exam.*
-
----
-
-### 💡 Hints
-- **Key Concepts** — the 5 most important ideas
-- **Watch Out For** — common mistakes and tricky parts
-- **Memory Tricks** — mnemonics and tips
-- **In Plain English** — a simple one-paragraph explanation
-
-*Use when something is not clicking and you need a different angle.*
-
----
-
-### 🧠 Study Mode — Active Recall
-
-**The most effective way to study.**
-
-How it works:
-1. AI generates 6 questions — answers are hidden from you
-2. Questions appear one at a time
-3. You type your answer before seeing the model answer
-4. AI evaluates: ✅ Correct / ⚠️ Partial / ❌ Wrong + one sentence of feedback
-5. Model answer is revealed after your attempt
-6. Session ends with your score % and the option to retry only the ones you got wrong
-
-**Why it works:** Forcing yourself to produce an answer before seeing it is called *active recall* — the most evidence-backed study technique in educational research. Re-reading notes is much less effective.
-
----
-
-### 🎓 Feynman Mode
-
-**Based on the Feynman Technique**, developed by Nobel Prize physicist Richard Feynman.
-
-*"If you cannot explain something simply, you do not truly understand it."*
-
-How it works:
-1. AI identifies 3–5 key topics from your content
-2. Each topic appears one at a time
-3. You explain the topic in your own words — as if teaching a complete beginner
-4. AI evaluates your explanation with a score (1–10) and structured feedback:
-   - What you got right
-   - Gaps in your explanation
-   - Any misconceptions
-   - How to improve
-5. Score below 6 → retry button shown, next topic locked
-6. Score 6 or above → move to the next topic
-
-**Why it works:** Writing an explanation forces you to confront exactly what you do and do not know. It is a more accurate test of understanding than answering questions about something you just read.
-
----
-
-### 🃏 Flashcards
-
-12 interactive flip cards generated from your content.
-
-- Click a card to reveal the answer
-- Click **✓ Knew it** or **✗ Didn't know** after each card
-- At the end: retry only the cards you missed
-
----
-
-## ✏️ Right-click shortcuts
-
-Select any text on a Canvas page, right-click, and choose:
-
-- **Explain this with AI** — opens the panel with an instant explanation
-- **Summarise this with AI** — opens the panel with an instant summary
-
----
-
-## ☁️ Using Cloud AI (no powerful laptop needed)
-
-Students with older laptops (less than 8 GB RAM) can use a cloud AI provider instead of Ollama. The output quality is also significantly better with cloud models.
-
-In **⚙️ Settings → Cloud AI**, select a provider and paste your API key:
-
-| Provider | Cost | Free tier | Sign up |
-|---|---|---|---|
-| **OpenRouter** | Pay per use | ✅ Yes | openrouter.ai/keys |
-| **OpenAI** | ~€0.001 per run | ❌ No | platform.openai.com/api-keys |
-| **Anthropic** | ~€0.001 per run | ❌ No | console.anthropic.com |
-
-When a cloud key is set, it is used automatically. The extension falls back to Ollama if no key is configured.
-
-**Privacy note:** When using cloud AI, your study content is sent to the provider's servers. With local Ollama, everything stays on your laptop.
-
+   
 ---
 
 ## 📓 Save to Notion
@@ -331,8 +225,14 @@ canvas-ext-v2/
     ├── icon48.png
     └── icon128.png
 ```
+## 🛠️ Built with
+
+- [Claude Sonnet 4.6](https://anthropic.com) — AI code generation and iteration
+- [Ollama](https://ollama.com) — local AI model runner
+- [PDF.js](https://mozilla.github.io/pdf.js/) — PDF extraction
+- [Mammoth.js](https://github.com/mwilliamson/mammoth.js) — Word document extraction
+- [JSZip](https://stuk.github.io/jszip/) — PowerPoint and Excel extraction
 
 ---
 
-*Built for Thomas More University College students.*  
-*Local AI powered by Ollama. File extraction uses PDF.js, Mammoth.js, and JSZip — all open source.*
+*Built for Thomas More University College students.*
