@@ -25,7 +25,13 @@ StudyFlow is a Chrome extension that brings AI study tools directly into Canvas 
 
 ## 🚀 Installation
 
-Choose your operating system:
+### 📥 Step 1 — Download the project
+
+1. Click the green **Code** button at the top of this page
+2. Click **Download ZIP**
+3. Extract the ZIP file — you'll get a folder called `canvas-ext-v2`
+
+Then follow the steps for your operating system:
 
 ---
 
