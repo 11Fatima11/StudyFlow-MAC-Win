@@ -6,7 +6,9 @@ StudyFlow is a Chrome extension that brings AI study tools directly into Canvas 
 > Built as a first-year student project using Claude Sonnet 4.6 and Ollama.
 
 ---
+![StudyFlow in action](Screenshot.png)
 
+---
 ## ✨ What it does
 
 | Mode | What you get |
