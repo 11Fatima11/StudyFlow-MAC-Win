@@ -1,16 +1,16 @@
 @echo off
 setlocal enabledelayedexpansion
-title Canvas AI Helper -- Installer
+title StudyFlow -- Installer
 
 :: ================================================================
-::  Canvas AI Helper - One-Click Installer for Windows
+::  StudyFlow - One-Click Installer for Windows
 ::  Installs: Ollama + gemma3:1b + phi3:mini + qwen2.5:0.5b
 :: ================================================================
 
 color 0B
 echo.
 echo  ============================================================
-echo    Canvas AI Helper -- One-Click Installer
+echo    StudyFlow -- One-Click Installer
 echo  ============================================================
 echo.
 echo  This will install everything you need to study with AI:
