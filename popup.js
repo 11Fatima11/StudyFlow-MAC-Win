@@ -31,10 +31,10 @@ const subjectsList   = document.getElementById("subjects-list");
 const newSubjName    = document.getElementById("new-subj-name");
 const newSubjId      = document.getElementById("new-subj-id");
 const addSubjBtn     = document.getElementById("add-subj-btn");
-const cloudProvider  = document.getElementById("cloud-provider");
-const cloudApiKey    = document.getElementById("cloud-api-key");
-const testCloudBtn   = document.getElementById("test-cloud-btn");
-const cloudStatus    = document.getElementById("cloud-status");
+//const cloudProvider  = document.getElementById("cloud-provider");
+//const cloudApiKey    = document.getElementById("cloud-api-key");
+//const testCloudBtn   = document.getElementById("test-cloud-btn");
+//const cloudStatus    = document.getElementById("cloud-status");
 
 // History
 const historyBtn     = document.getElementById("history-btn");
@@ -43,7 +43,7 @@ const historyList    = document.getElementById("history-list");
 const historyEmpty   = document.getElementById("history-empty");
 const clearHistBtn   = document.getElementById("clear-history-btn");
 
-// Notion / Anki bottom
+// Notion bottom
 const subjectSel     = document.getElementById("subject-sel");
 const notionTitleEl  = document.getElementById("notion-title-input");
 const saveNotionBtn  = document.getElementById("saveNotionBtn");
@@ -213,7 +213,7 @@ function renderSubjectDropdown() {
 }
 
 // Cloud API test
-document.addEventListener("DOMContentLoaded", () => {
+/*document.addEventListener("DOMContentLoaded", () => {
   if (testCloudBtn) testCloudBtn.addEventListener("click", testCloudConnection);
   if (cloudProvider) cloudProvider.addEventListener("change", () => {
     const hints = {
@@ -249,12 +249,12 @@ function showCloudStatus(type, msg) {
   cloudStatus.style.display = "block";
   cloudStatus.style.background = type === "ok" ? "#d1fae5" : "#fee2e2";
   cloudStatus.style.color      = type === "ok" ? "#065f46"  : "#991b1b";
-}
+}*/
 
 
 
 function addOpt(sel,val,label){ const o=document.createElement("option"); o.value=val; o.textContent=label; sel.appendChild(o); }
-function currentModel(){ return modelSelect.value||savedModel||"gemma2:2b"; }
+function currentModel(){ return modelSelect.value||savedModel||"gemma3:1b"; }
 function updateRunLabel(){ runBtn.textContent=`▶ Run with ${savedModel||"Ollama"}`; }
 function checkTokenWarning(){ tokenWarning.style.display=savedNotionToken?"none":"block"; }
 
@@ -508,7 +508,7 @@ function buildFlashcardPrompt(text) {
 }
 
 // ── AI router: cloud first if configured, else Ollama ────────────
-async function callOllama({ system, prompt }, model) {
+/*async function callOllama({ system, prompt }, model) {
   // Use cloud if provider + key are configured
   if (savedCloudProvider && savedCloudKey) {
     return callCloud({ system, prompt }, savedCloudProvider, savedCloudKey);
@@ -576,7 +576,7 @@ async function callCloud({ system, prompt }, provider, key) {
   }
 
   throw new Error("Unknown cloud provider: " + provider);
-}
+}*/
 
 // Parse JSON from LLM (handles markdown fences)
 function parseJsonResponse(raw) {
@@ -969,7 +969,7 @@ flashRetryAll.addEventListener("click",  ()=>beginFlashRound(flashCards.map((_,i
 flashBackBtn.addEventListener("click",()=>{ flashWrap.style.display="none"; });
 
 // ═══════════════════════════════════════════════════════════════════
-// COPY + NOTION + ANKI (bottom bar)
+// COPY + NOTION (bottom bar)
 // ═══════════════════════════════════════════════════════════════════
 copyBtn.addEventListener("click", async ()=>{
   await navigator.clipboard.writeText(outputEl.textContent).catch(()=>{});
@@ -1001,4 +1001,4 @@ saveNotionBtn.addEventListener("click", async()=>{
 // ── AnkiConnect helper ────────────────────────────────────────────
 
 
-function escHtml(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+//function escHtml(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
