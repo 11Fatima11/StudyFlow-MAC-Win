@@ -1,6 +1,5 @@
 // popup.js — StudyFlow v13
-// Fixes: callOllama defined, escHtml restored, flashRetryWrong declared,
-//        retryWrong logic fixed, all hardcoded domains removed, savedAnkiDeck declared.
+
 
 // ── DOM refs ──────────────────────────────────────────────────────
 const inputTextEl    = document.getElementById("inputText");
