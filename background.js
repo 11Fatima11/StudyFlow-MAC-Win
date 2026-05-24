@@ -39,7 +39,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 });
 
 // ── Message router ────────────────────────────────────────────────
-chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+/*chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (msg.type === "ANKI_REQUEST") {
     fetch("http://localhost:8765", {
       method: "POST",
@@ -57,7 +57,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
       .catch(e   => sendResponse({ ok: false, error: e.message }));
     return true;
   }
-});
+});*/
 
 // ── Fetch + dispatch ──────────────────────────────────────────────
 async function bgExtract(url, filename, kind) {
