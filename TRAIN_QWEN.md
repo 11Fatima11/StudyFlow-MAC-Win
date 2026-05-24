@@ -63,15 +63,15 @@ Model answer outline:
 
 Open a terminal and run:
 ```bash
-ollama create canvas-study-ai -f ./Modelfile
+ollama create StudyFlow -f ./Modelfile
 ```
 
 ## Step 3 — Use it in the extension
 
 1. Open the extension → ⚙️ Settings
 2. Click ↻ Refresh models
-3. Select **canvas-study-ai** from the dropdown
-4. Save Settings
+3. Select **StudyFlow** from the dropdown
+4. Save Settings  
 
 Your custom model will now follow formats much more reliably.
 
