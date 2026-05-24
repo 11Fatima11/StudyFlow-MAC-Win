@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ================================================================
-#  Canvas AI Helper — One-Click Installer for macOS
+#  StudyFlow — One-Click Installer for macOS
 #  Installs: Ollama + gemma3:1b + phi3:mini + qwen2.5:0.5b
 # ================================================================
 
@@ -18,7 +18,7 @@ RESET='\033[0m'
 clear
 echo ""
 echo -e "${BOLD}  ============================================================${RESET}"
-echo -e "${BOLD}   🎓  Canvas AI Helper — One-Click Installer (macOS)${RESET}"
+echo -e "${BOLD}   🎓  StudyFlow — One-Click Installer (macOS)${RESET}"
 echo -e "${BOLD}  ============================================================${RESET}"
 echo ""
 echo "  This will install everything you need to study with AI:"
