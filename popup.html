@@ -47,6 +47,9 @@ body{font-family:system-ui,-apple-system,sans-serif;font-size:13px;width:100%;ma
 .add-row button{padding:5px 10px;background:#7c3aed;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;white-space:nowrap}
 
 /* ── History panel ── */
+/* FIX: removed conflicting inline display:none/flex — JS controls visibility via togglePanel() */
+#history-panel{padding:0;max-height:420px;overflow:hidden;flex-direction:column}
+#history-panel.open{display:flex}
 #history-list{display:flex;flex-direction:column;gap:6px;padding:13px 14px;flex:1;overflow-y:auto}
 .hist-item{padding:8px 10px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;cursor:pointer;transition:border-color .12s;flex-shrink:0}
 .hist-item:hover{border-color:#7c3aed;background:#faf5ff}
@@ -83,7 +86,7 @@ body{font-family:system-ui,-apple-system,sans-serif;font-size:13px;width:100%;ma
 #progress-bar{height:100%;width:0%;background:#7c3aed;border-radius:3px;transition:width .3s}
 #extract-status{font-size:11px;color:#7c3aed;background:#faf5ff;border:1px solid #e9d5ff;border-radius:5px;padding:5px 9px;display:none}
 
-/* ── Mode buttons (replace select) ── */
+/* ── Mode buttons ── */
 .mode-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
 .mode-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border:1.5px solid #e5e7eb;border-radius:8px;background:#f9fafb;cursor:pointer;transition:all .15s;font-size:10px;color:#6b7280;font-weight:500}
 .mode-btn:hover{border-color:#a78bfa;background:#faf5ff;color:#5b21b6}
@@ -110,30 +113,20 @@ body{font-family:system-ui,-apple-system,sans-serif;font-size:13px;width:100%;ma
 .out-btn:hover{border-color:#7c3aed;color:#7c3aed}
 #output{padding:10px 12px;border:1px solid #e5e7eb;border-radius:8px;background:#f9fafb;white-space:pre-wrap;word-break:break-word;max-height:240px;overflow-y:auto;font-size:12.5px;line-height:1.7;color:#1f2937}
 
-/* ══════════════════════════════════════════════
-   STUDY MODE UI
-══════════════════════════════════════════════ */
+/* ══ STUDY MODE ══ */
 #study-wrap{display:none}
-
-/* Progress header */
 .study-progress-bar{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .study-prog-bg{flex:1;height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden}
 .study-prog-fill{height:100%;background:linear-gradient(90deg,#f59e0b,#d97706);border-radius:3px;transition:width .4s}
 .study-prog-label{font-size:11px;color:#92400e;font-weight:600;white-space:nowrap}
-
-/* Score strip */
 .study-score-strip{display:flex;gap:6px;margin-bottom:10px}
 .score-pill{flex:1;text-align:center;padding:4px 6px;border-radius:6px;font-size:11px;font-weight:600}
 .score-pill.correct{background:#d1fae5;color:#065f46}
 .score-pill.wrong{background:#fee2e2;color:#991b1b}
 .score-pill.remaining{background:#f3f4f6;color:#6b7280}
-
-/* Question card */
 .study-card{background:#fffbeb;border:2px solid #fcd34d;border-radius:10px;padding:13px 14px;margin-bottom:10px}
 .study-q-num{font-size:10px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
 .study-q-text{font-size:13px;font-weight:600;color:#1f2937;line-height:1.5}
-
-/* Answer area */
 .study-answer-area{display:flex;flex-direction:column;gap:7px;margin-bottom:8px}
 #study-answer{width:100%;min-height:70px;resize:vertical;padding:8px 10px;font-size:12px;border:1.5px solid #d1d5db;border-radius:8px;outline:none;font-family:inherit;color:#1f2937;line-height:1.5;transition:border-color .15s}
 #study-answer:focus{border-color:#f59e0b}
@@ -143,8 +136,6 @@ body{font-family:system-ui,-apple-system,sans-serif;font-size:13px;width:100%;ma
 #check-btn:disabled{opacity:.5;cursor:not-allowed}
 #skip-btn{padding:8px 12px;background:#fff;color:#6b7280;border:1px solid #d1d5db;border-radius:7px;font-size:12px;cursor:pointer;transition:all .15s}
 #skip-btn:hover{border-color:#9ca3af;color:#374151}
-
-/* Feedback box */
 #study-feedback{display:none;border-radius:8px;padding:11px 13px;margin-bottom:8px;font-size:12px;line-height:1.6}
 #study-feedback.correct{background:#d1fae5;border:1.5px solid #6ee7b7;color:#065f46}
 #study-feedback.partial{background:#fef3c7;border:1.5px solid #fcd34d;color:#78350f}
@@ -154,8 +145,6 @@ body{font-family:system-ui,-apple-system,sans-serif;font-size:13px;width:100%;ma
 .feedback-model-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;opacity:.7;margin-bottom:3px}
 #next-btn{width:100%;padding:8px;background:#4f46e5;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s;display:none}
 #next-btn:hover{opacity:.88}
-
-/* Session complete screen */
 #study-complete{display:none;text-align:center;padding:20px 10px}
 .complete-emoji{font-size:42px;margin-bottom:10px}
 .complete-title{font-size:16px;font-weight:700;color:#1f2937;margin-bottom:6px}
@@ -171,17 +160,12 @@ body{font-family:system-ui,-apple-system,sans-serif;font-size:13px;width:100%;ma
 .complete-btn.retry-wrong{background:#ef4444;color:#fff}.complete-btn.retry-wrong:hover{opacity:.88}
 .complete-btn.back{background:#f3f4f6;color:#374151;border:1px solid #e5e7eb}.complete-btn.back:hover{background:#e5e7eb}
 
-/* ══════════════════════════════════════════════
-   FLASHCARD MODE UI
-══════════════════════════════════════════════ */
+/* ══ FLASHCARD MODE ══ */
 #flash-wrap{display:none}
-
-/* Card flip */
 .flash-progress-bar{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .flash-prog-bg{flex:1;height:5px;background:#e5e7eb;border-radius:3px;overflow:hidden}
 .flash-prog-fill{height:100%;background:linear-gradient(90deg,#10b981,#059669);border-radius:3px;transition:width .4s}
 .flash-prog-label{font-size:11px;color:#065f46;font-weight:600;white-space:nowrap}
-
 .flash-card-wrap{perspective:800px;margin-bottom:10px}
 .flash-card{position:relative;width:100%;min-height:130px;cursor:pointer;transform-style:preserve-3d;transition:transform .5s}
 .flash-card.flipped{transform:rotateY(180deg)}
@@ -191,18 +175,15 @@ body{font-family:system-ui,-apple-system,sans-serif;font-size:13px;width:100%;ma
 .flash-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;opacity:.6}
 .flash-text{font-size:13px;font-weight:600;color:#1f2937;line-height:1.5}
 .flash-hint{font-size:10px;color:#6b7280;margin-top:8px}
-
 .flash-nav{display:flex;gap:7px;margin-bottom:8px}
 .flash-nav-btn{flex:1;padding:8px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;border:1.5px solid}
 .flash-nav-btn.knew{background:#d1fae5;border-color:#34d399;color:#065f46}.flash-nav-btn.knew:hover{background:#a7f3d0}
 .flash-nav-btn.didnt{background:#fee2e2;border-color:#fca5a5;color:#991b1b}.flash-nav-btn.didnt:hover{background:#fecaca}
 .flash-nav-btn.flip{background:#fff;border-color:#d1d5db;color:#374151}.flash-nav-btn.flip:hover{border-color:#7c3aed;color:#5b21b6}
-
-/* Flash complete */
 #flash-complete{display:none;text-align:center;padding:16px 6px}
 .flash-complete-actions{display:flex;flex-direction:column;gap:7px;margin-top:14px}
 
-/* ── Bottom section ── */
+/* ── Bottom ── */
 .divider{border:none;border-top:1px solid #e5e7eb}
 .section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#6b7280}
 .save-notion-block{display:flex;flex-direction:column;gap:5px}
@@ -213,8 +194,11 @@ body{font-family:system-ui,-apple-system,sans-serif;font-size:13px;width:100%;ma
 #notion-title-input:focus{border-color:#7c3aed}
 #saveNotionBtn{padding:6px 12px;background:#fff;color:#374151;border:1px solid #d1d5db;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
 #saveNotionBtn:hover{background:#f3f4f6}
-
 #token-warning{font-size:11px;color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:5px;padding:5px 9px;display:none}
+
+/* ── Rescan button ── */
+#rescan-btn{font-size:11px;padding:2px 7px;border:1px solid #d1d5db;border-radius:5px;background:#fff;cursor:pointer;color:#6b7280;margin-left:6px}
+#rescan-btn:hover{border-color:#7c3aed;color:#7c3aed}
 </style>
 </head>
 <body>
@@ -242,27 +226,6 @@ body{font-family:system-ui,-apple-system,sans-serif;font-size:13px;width:100%;ma
       <div class="hint">Recommended: <b>gemma3:1b</b> — fast and follows instructions well</div>
     </div>
   </div>
-  <!-- <div class="tab-section">
-    <div class="tab-section-title">☁️ Cloud AI (optional)</div>
-    <div class="sfield">
-      <label>Provider</label>
-      <select id="cloud-provider">
-        <option value="">— Use local Ollama only —</option>
-        <option value="openai">OpenAI (GPT-4o-mini)</option>
-        <option value="anthropic">Anthropic (Claude Haiku)</option>
-        <option value="openrouter">OpenRouter (free models)</option>
-      </select>
-      <div class="hint">When set, cloud AI is used instead of Ollama. Much better quality, costs ~€0.001–0.01 per run.</div>
-    </div>
-    <div class="sfield">
-      <label>API Key</label>
-      <input type="password" id="cloud-api-key" placeholder="Paste your API key here" autocomplete="off"/>
-      <div class="hint" id="cloud-key-hint">OpenAI: platform.openai.com/api-keys · Anthropic: console.anthropic.com · OpenRouter: openrouter.ai/keys (has free tier)</div>
-    </div>
-    <button class="icon-btn" id="test-cloud-btn" style="width:100%;margin-top:4px">Test Cloud Connection</button>
-    <div id="cloud-status" style="font-size:11px;padding:4px 8px;border-radius:5px;margin-top:4px;display:none"></div>
-  </div> -->
-
 
   <div class="tab-section">
     <div class="tab-section-title">📓 Notion</div>
@@ -288,7 +251,8 @@ body{font-family:system-ui,-apple-system,sans-serif;font-size:13px;width:100%;ma
 </div>
 
 <!-- ══ HISTORY ══ -->
-<div class="tab-panel" id="history-panel" style="padding:0;max-height:420px;overflow:hidden;display:none;flex-direction:column">
+<!-- FIX: removed conflicting inline style; CSS class .open handles display:flex -->
+<div class="tab-panel" id="history-panel">
   <div id="history-list"></div>
   <div id="history-empty">No history yet.</div>
   <button id="clear-history-btn">🗑 Clear all history</button>
@@ -308,9 +272,13 @@ body{font-family:system-ui,-apple-system,sans-serif;font-size:13px;width:100%;ma
   </div>
 
   <div>
-    <div id="files-label">Detected files: <span id="files-count">scanning…</span></div>
+    <!-- FIX: added ↻ Rescan button so users can re-trigger scan after Canvas loads -->
+    <div id="files-label">
+      Detected files: <span id="files-count">scanning…</span>
+      <button id="rescan-btn" title="Re-scan page for files">↻ Rescan</button>
+    </div>
     <div id="files-list"></div>
-    <span id="no-files-note" style="display:none">None found.</span>
+    <span id="no-files-note" style="display:none">None found on this page.</span>
   </div>
 
   <div id="progress-wrap">
@@ -381,7 +349,6 @@ body{font-family:system-ui,-apple-system,sans-serif;font-size:13px;width:100%;ma
     </div>
     <button id="next-btn">Next question →</button>
 
-    <!-- Session complete -->
     <div id="study-complete">
       <div class="complete-emoji" id="complete-emoji">🎉</div>
       <div class="complete-title" id="complete-title">Session Complete!</div>
@@ -394,7 +361,6 @@ body{font-family:system-ui,-apple-system,sans-serif;font-size:13px;width:100%;ma
       <div class="complete-actions">
         <button class="complete-btn retry" id="retry-all-btn">🔄 Retry all questions</button>
         <button class="complete-btn retry-wrong" id="retry-wrong-btn" style="display:none">🎯 Retry wrong only</button>
-        <button class="complete-btn anki" id="study-to-anki-btn" style="display:none">🃏 Send wrong ones to Anki</button>
         <button class="complete-btn back" id="study-back-btn">← Back to content</button>
       </div>
     </div>
@@ -410,7 +376,8 @@ body{font-family:system-ui,-apple-system,sans-serif;font-size:13px;width:100%;ma
     <textarea id="feynman-answer" style="width:100%;min-height:110px;resize:vertical;padding:8px 10px;font-size:12px;border:1.5px solid #d1d5db;border-radius:8px;outline:none;font-family:inherit;line-height:1.5;transition:border-color .15s;margin-bottom:8px" placeholder="Explain the topic here in your own words…"></textarea>
     <button id="feynman-check-btn" style="width:100%;padding:9px;background:#4f46e5;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px">🎓 Evaluate my explanation</button>
     <div id="feynman-feedback" style="display:none;border-radius:8px;padding:12px 13px;font-size:12px;line-height:1.7"></div>
-    <div id="feynman-next-row" style="display:none;display:none">
+    <!-- FIX: removed duplicate display:none -->
+    <div id="feynman-next-row" style="display:none">
       <button id="feynman-retry-btn" style="width:100%;padding:8px;background:#f59e0b;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:6px">🔄 Try again</button>
       <button id="feynman-next-btn" style="width:100%;padding:8px;background:#6366f1;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer">Next topic →</button>
     </div>
@@ -463,8 +430,6 @@ body{font-family:system-ui,-apple-system,sans-serif;font-size:13px;width:100%;ma
       <button id="saveNotionBtn">📓 Save</button>
     </div>
   </div>
-
-
 
 </div><!-- /main -->
 </div><!-- /scroll-body -->

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "StudyFlow",
-  "version": "12.0",
-  "description": "AI study assistant for Canvas LMS \u2014 extract files, generate study materials, save to Notion.",
+  "version": "13.0",
+  "description": "AI study assistant for Canvas LMS — extract files, generate study materials, save to Notion.",
   "action": {
     "default_title": "StudyFlow"
   },
@@ -20,7 +20,7 @@
   "host_permissions": [
     "https://api.notion.com/*",
     "http://localhost:11434/*",
-    "https://thomasmore.instructure.com/*",
+    "https://*.instructure.com/*",
     "https://*.canvas-user-content.com/*"
   ],
   "background": {
@@ -28,20 +28,14 @@
   },
   "content_scripts": [
     {
-      "matches": [
-        "https://thomasmore.instructure.com/*"
-      ],
-      "js": [
-        "libs/jszip.min.js",
-        "libs/mammoth.browser.min.js",
-        "content.js"
-      ],
+      "matches": ["https://*.instructure.com/*"],
+      "js": ["content.js"],
       "run_at": "document_idle"
     }
   ],
   "icons": {
-    "16": "icons/icon16.png",
-    "48": "icons/icon48.png",
+    "16":  "icons/icon16.png",
+    "48":  "icons/icon48.png",
     "128": "icons/icon128.png"
   }
 }

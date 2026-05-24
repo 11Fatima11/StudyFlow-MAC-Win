@@ -1,7 +1,8 @@
-// content.js — Canvas AI Helper
+// content.js — StudyFlow v13
 // Handles: text selection, file scanning, URL resolution for file extraction.
+// Works on any *.instructure.com Canvas instance.
 
-// ── 1. Selected-text watcher ─────────────────────────────────────
+// ── 1. Selected-text watcher ──────────────────────────────────────
 document.addEventListener("mouseup",  pushSelection);
 document.addEventListener("keyup",    pushSelection);
 document.addEventListener("touchend", pushSelection);
@@ -19,8 +20,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     return true;
   }
   if (msg.type === "GET_SELECTION") {
-    const text = window.getSelection()?.toString().trim() ?? "";
-    sendResponse({ text });
+    sendResponse({ text: window.getSelection()?.toString().trim() ?? "" });
     return true;
   }
   if (msg.type === "RESOLVE_URL") {
@@ -31,7 +31,18 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   }
 });
 
-// ── 3. File scanner ───────────────────────────────────────────────
+// ── 3. SPA navigation watcher ────────────────────────────────────
+// Canvas is a single-page app. Re-scan when the URL changes.
+let _lastUrl = location.href;
+new MutationObserver(() => {
+  if (location.href !== _lastUrl) {
+    _lastUrl = location.href;
+    // Notify the side panel that files may have changed
+    chrome.runtime.sendMessage({ type: "PAGE_NAVIGATED" }).catch(() => {});
+  }
+}).observe(document.body, { childList: true, subtree: true });
+
+// ── 4. File scanner ───────────────────────────────────────────────
 function scanFiles() {
   const seen    = new Set();
   const results = [];
@@ -47,17 +58,16 @@ function scanFiles() {
     });
   }
 
-  // ── A. All anchor links — catches PDFs, PPTX, DOCX, ZIP etc. ──
+  // ── A. All anchor links ───────────────────────────────────────
   document.querySelectorAll("a[href]").forEach(a => {
     const href = a.href || "";
     const text = a.textContent.trim();
-    const kind = kindFromUrl(href);
+    // FIX: fall back to "document" for Canvas /files/ links with no extension
+    const kind = kindFromUrl(href) || (href.includes("/files/") ? "document" : null);
     if (kind) add(text || null, href, kind);
   });
 
-  // ── B. Canvas instructure file links ──────────────────────────
-  // These are the main file links on Canvas module/file pages.
-  // Convert viewer URLs → direct download URL with download_frd=1
+  // ── B. Canvas instructure file links ─────────────────────────
   document.querySelectorAll(
     "a.instructure_file_link, a.instructure_scribd_file, " +
     "a[data-api-returntype='File'], a[href*='/files/']"
@@ -66,14 +76,12 @@ function scanFiles() {
               || a.textContent.trim() || null;
     let href = a.getAttribute("data-download-url") || a.href || "";
     if (href.includes("/files/") && !href.includes("/download") && !href.includes("download_frd")) {
-      const base = href.split("?")[0].replace(/\/$/, "");
-      href = base + "/download?download_frd=1";
+      href = href.split("?")[0].replace(/\/$/, "") + "/download?download_frd=1";
     }
     add(name, href, kindFromUrl(href) || "document");
   });
 
-  // ── C. Canvas module item file links ─────────────────────────
-  // Module pages list files with their title in .ig-title
+  // ── C. Module item file links ─────────────────────────────────
   document.querySelectorAll(".ig-row a[href*='/files/'], .module-item-title a[href*='/files/']").forEach(a => {
     const name = a.querySelector(".ig-title, .title")?.textContent?.trim() || a.textContent.trim() || null;
     let href = a.href || "";
@@ -83,30 +91,29 @@ function scanFiles() {
     add(name, href, kindFromUrl(href) || "document");
   });
 
-  // ── D. Embedded <iframe> content (PDFs, external docs) ────────
+  // ── D. Embedded iframes ───────────────────────────────────────
   document.querySelectorAll("iframe[src]").forEach(fr => {
-    const src = fr.src;
+    const src  = fr.src;
     if (!src || src === "about:blank") return;
-    const kind = kindFromUrl(src) ||
-      (src.includes("/files/") || src.endsWith(".pdf") ? "document" : null);
+    const kind = kindFromUrl(src) || (src.includes("/files/") || src.endsWith(".pdf") ? "document" : null);
     if (kind) add(fr.title || null, src, kind);
   });
 
-  // ── E. <embed> and <object> tags ─────────────────────────────
+  // ── E. <embed> and <object> ───────────────────────────────────
   document.querySelectorAll("embed[src], object[data]").forEach(el => {
     const src = el.src || el.data || "";
     if (!src) return;
     add(null, src, kindFromUrl(src) || "document");
   });
 
-  // ── F. data-src attributes (lazy-loaded content) ─────────────
+  // ── F. data-src (lazy-loaded) ────────────────────────────────
   document.querySelectorAll("[data-src]").forEach(el => {
     const src  = el.dataset.src || "";
     const kind = kindFromUrl(src);
     if (kind) add(el.title || el.alt || null, src, kind);
   });
 
-  // ── G. Canvas assignment/discussion attachment links ──────────
+  // ── G. Assignment / discussion attachments ────────────────────
   document.querySelectorAll(
     ".attachment a[href], .submission-attachment a[href], " +
     ".comment-attachment a[href], .file_download_btn[href]"
@@ -117,19 +124,18 @@ function scanFiles() {
     if (kind) add(name, href, kind);
   });
 
-  // ── H. Direct file links in page body text ────────────────────
-  // Catches files linked inside rich-text content areas
+  // ── H. Rich-text content areas ───────────────────────────────
   document.querySelectorAll(
     ".show-content a[href], .user_content a[href], " +
     ".assignment-description a[href], .entry-content a[href]"
   ).forEach(a => {
     const href = a.href || "";
     const text = a.textContent.trim();
-    const kind = kindFromUrl(href);
+    const kind = kindFromUrl(href) || (href.includes("/files/") ? "document" : null);
     if (kind) add(text || null, href, kind);
   });
 
-  // ── I. Images embedded in content ────────────────────────────
+  // ── I. Embedded images ───────────────────────────────────────
   document.querySelectorAll(
     ".show-content img[src], .user_content img[src], " +
     ".assignment-description img[src]"
@@ -145,18 +151,15 @@ function scanFiles() {
 // ── URL resolver: Canvas viewer URL → direct CDN download URL ────
 async function resolveCanvasUrl(url) {
   const u = url.toLowerCase();
-  // Already a direct/signed link
   if (u.includes("/download") || u.includes("download_frd=1") || u.includes("verifier=")) {
     return url;
   }
-  // Extract Canvas file ID and call the API for a pre-signed CDN URL
   const m = url.match(/\/files\/(\d+)/);
   if (m) {
     try {
-      const r = await fetch(
-        `https://thomasmore.instructure.com/api/v1/files/${m[1]}`,
-        { credentials: "include" }
-      );
+      // Use current hostname so this works on any Canvas instance
+      const base = `${location.protocol}//${location.hostname}`;
+      const r    = await fetch(`${base}/api/v1/files/${m[1]}`, { credentials: "include" });
       if (r.ok) {
         const d = await r.json();
         if (d.url) return d.url;
@@ -172,14 +175,14 @@ async function resolveCanvasUrl(url) {
 function kindFromUrl(url) {
   if (!url) return null;
   const u = url.toLowerCase().split("?")[0];
-  if (/\.(pdf)$/.test(u))                                              return "document";
-  if (/\.(doc|docx|odt|rtf|txt|md)$/.test(u))                         return "document";
-  if (/\.(ppt|pptx|odp)$/.test(u))                                    return "presentation";
-  if (/\.(xls|xlsx|ods|csv)$/.test(u))                                return "spreadsheet";
-  if (/\.(mp4|mov|avi|webm|mkv|m4v|ogv)$/.test(u))                   return "video";
-  if (/\.(mp3|wav|ogg|m4a|aac|flac|opus)$/.test(u))                  return "audio";
-  if (/\.(jpg|jpeg|png|gif|webp|svg|bmp|tiff)$/.test(u))             return "image";
-  if (/\.(zip|rar|7z|tar|gz|bz2)$/.test(u))                          return "archive";
+  if (/\.(pdf)$/.test(u))                                                   return "document";
+  if (/\.(doc|docx|odt|rtf|txt|md)$/.test(u))                              return "document";
+  if (/\.(ppt|pptx|odp)$/.test(u))                                         return "presentation";
+  if (/\.(xls|xlsx|ods|csv)$/.test(u))                                      return "spreadsheet";
+  if (/\.(mp4|mov|avi|webm|mkv|m4v|ogv)$/.test(u))                         return "video";
+  if (/\.(mp3|wav|ogg|m4a|aac|flac|opus)$/.test(u))                        return "audio";
+  if (/\.(jpg|jpeg|png|gif|webp|svg|bmp|tiff)$/.test(u))                   return "image";
+  if (/\.(zip|rar|7z|tar|gz|bz2)$/.test(u))                                return "archive";
   if (/\.(py|js|java|cpp|c|cs|html|css|ipynb|r|sh|ts|json|xml)$/.test(u)) return "code";
   return null;
 }
