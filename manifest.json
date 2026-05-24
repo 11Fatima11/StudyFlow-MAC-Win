@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "StudyFlow",
   "version": "12.0",
-  "description": "AI study assistant for Canvas LMS \u2014 extract files, generate study materials, save to Notion & Anki.",
+  "description": "AI study assistant for Canvas LMS \u2014 extract files, generate study materials, save to Notion.",
   "action": {
     "default_title": "StudyFlow"
   },
@@ -21,10 +21,7 @@
     "https://api.notion.com/*",
     "http://localhost:11434/*",
     "https://thomasmore.instructure.com/*",
-    "https://*.canvas-user-content.com/*",
-    "https://api.openai.com/*",
-    "https://api.anthropic.com/*",
-    "https://openrouter.ai/*"
+    "https://*.canvas-user-content.com/*"
   ],
   "background": {
     "service_worker": "background.js"
