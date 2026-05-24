@@ -103,7 +103,7 @@ Switch models anytime in ⚙️ Settings.
 | | Windows | Mac |
 |---|---|---|
 | **OS** | Windows 10 or 11 | macOS 12 Monterey or newer |
-| **RAM** | 8 GB recommended (4 GB minimum with Cloud AI) | 8 GB recommended (Apple Silicon M1+ works great) |
+| **RAM** | 8 GB recommended | 8 GB recommended (Apple Silicon M1+ works great) |
 | **Storage** | ~5 GB for all 3 models | ~5 GB for all 3 models |
 | **Browser** | Google Chrome 114+ | Google Chrome 114+ |
 | **Internet** | Required during setup | Required during setup |
@@ -200,7 +200,6 @@ chmod +x /path/to/canvas-ext-v2/install.sh
 | Action | Where your data goes |
 |---|---|
 | Generating with Ollama | **Stays on your laptop — nothing sent anywhere** |
-| Generating with Cloud AI | Sent to OpenAI, Anthropic, or OpenRouter servers |
 | Saving to Notion | Sent to Notion's servers |
 | Settings, history, subjects | Stored locally in Chrome's encrypted storage only |
 
@@ -209,7 +208,7 @@ chmod +x /path/to/canvas-ext-v2/install.sh
 ## 📁 What is in this folder
 
 ```
-canvas-ext-v2/
+StudyFlow-MAC-Win-main/
 │
 ├── install.bat          ← Windows one-click installer
 ├── install.sh           ← Mac one-click installer
@@ -217,7 +216,7 @@ canvas-ext-v2/
 ├── TRAIN_QWEN.md        ← Guide: how to fine-tune your own AI model
 │
 ├── manifest.json        ← Chrome extension configuration
-├── background.js        ← File extraction engine + cloud AI routing
+├── background.js        ← File extraction engine
 ├── content.js           ← Canvas page file scanner
 ├── popup.html           ← Extension interface
 ├── popup.js             ← Extension logic (modes, history, settings)
